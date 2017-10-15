@@ -18,7 +18,8 @@ public class Main {
             Boolean accepted = false;
             System.out.println("Current state: " + initialState);
             stateHistory.add(initialState);
-            List<Pair<Integer, Boolean>> currentStatesList = Arrays.asList(new Pair(initialState, true));
+            List<Pair<Integer, Boolean>> currentStatesList = new ArrayList(Arrays.asList(new Pair(initialState, true)));
+            printStates(currentStatesList);
             int state = initialState;
             for(int inputIndex=0; inputIndex < series.length(); inputIndex++){
                 int word = Integer.parseInt(series.substring(inputIndex, inputIndex+1));
@@ -93,16 +94,18 @@ public class Main {
                                     currentStatesList.set(statesIndex, new Pair(10, false));
                                 break;
                             case 11:
-                                accepted = true;
                                 break;
                         }
                     }
-                    printStates(currentStatesList);
                     stateHistory.add(state);
                 }
+                currentStatesList.add(new Pair(initialState, true));
+                printStates(currentStatesList);
             }
-            if(accepted || state == 11)
-                acceptedSeries.add(series);
+            for (int statesIndex = 0; statesIndex < currentStatesList.size(); statesIndex++) {
+                if (currentStatesList.get(statesIndex).getKey() == 11)
+                    acceptedSeries.add(series);
+            }
             System.out.println("State history: " + stateHistory);
         }
         System.out.println("Accepted series:");
@@ -112,11 +115,7 @@ public class Main {
     }
 
     private static void printStates(final List<Pair<Integer, Boolean>> currentStatesList) {
-        for(int index = 0; index < currentStatesList.size(); index++){
-            Pair<Integer, Boolean> pair = currentStatesList.get(index);
-            if(pair.getValue())
-                System.out.println(index + ". State: " + currentStatesList.get(index).getKey());
-        }
+        System.out.println("Current States: " + currentStatesList.toString());
     }
 
 
