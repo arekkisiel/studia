@@ -115,7 +115,11 @@ public class Main {
     }
 
     private static void printStates(final List<Pair<Integer, Boolean>> currentStatesList) {
-        System.out.println("Current States: " + currentStatesList.toString());
+        System.out.println("Current States: ");
+        for(Pair<Integer, Boolean> state : currentStatesList){
+            if(state.getValue())
+                System.out.println(state.getKey());
+        }
     }
 
 
