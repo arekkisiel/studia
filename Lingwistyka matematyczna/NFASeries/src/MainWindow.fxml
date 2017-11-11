@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainWindowController">
+   <children>
+      <Button fx:id="LoadDataButton" layoutX="44.0" layoutY="309.0" mnemonicParsing="false" onAction="#readAndSeparateSeries" text="Load Data" />
+      <TextArea fx:id="ImportedSeries" layoutX="14.0" layoutY="58.0" prefHeight="200.0" prefWidth="180.0" />
+      <Label layoutX="30.0" layoutY="38.0" text="Imported Series" />
+      <Button fx:id="CheckAllSeriesButton" layoutX="142.0" layoutY="309.0" mnemonicParsing="false" onAction="#checkAllSeries" text="Check All" />
+      <TextField fx:id="CurrentSeries" layoutX="209.0" layoutY="58.0" />
+      <Label layoutX="209.0" layoutY="38.0" text="Current Series" />
+      <TextArea fx:id="AcceptedSeries" layoutX="392.0" layoutY="58.0" prefHeight="200.0" prefWidth="180.0" />
+      <Label layoutX="392.0" layoutY="38.0" text="Accepted Series" />
+      <TextArea fx:id="StateHistory" layoutX="209.0" layoutY="110.0" prefHeight="146.0" prefWidth="149.0" />
+      <Label layoutX="209.0" layoutY="93.0" text="State History" />
+      <Button fx:id="StepByStepButton" layoutX="235.0" layoutY="309.0" mnemonicParsing="false" onAction="#performSingleCheck" text="Step By Step" />
+   </children>
+</Pane>
