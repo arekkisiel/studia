@@ -30,7 +30,7 @@
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#c0c3c6" height="113.0" layoutX="269.0" layoutY="314.0" stroke="BLACK" strokeType="INSIDE" width="183.0" />
       <Label layoutX="268.0" layoutY="297.0" text="Task 2" />
       <Label layoutX="280.0" layoutY="322.0" text="Define set size (from 1 to 64):" />
-      <Button layoutX="280.0" layoutY="391.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="SFS" />
+      <Button layoutX="280.0" layoutY="391.0" mnemonicParsing="false" onAction="#sfsAlgorithm" prefHeight="25.0" prefWidth="156.0" text="SFS" />
       <TextArea fx:id="SetSize2" layoutX="279.0" layoutY="339.0" onKeyReleased="#verifyInput" prefHeight="38.0" prefWidth="165.0" text="1" />
     </children>
 </Pane>

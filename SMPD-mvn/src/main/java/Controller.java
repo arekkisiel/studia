@@ -81,20 +81,39 @@ public class Controller {
 
     @FXML
     public void sfsAlgorithm(ActionEvent actionEvent) {
-        List<Integer> selectedFeatures = new ArrayList<>();
-        for(int iteration = 0; iteration < Integer.parseInt(SetSize2.getText()); iteration++) {
+
+        int expectedSize = Integer.parseInt(SetSize2.getText());
+        if(expectedSize==1){
+            selectBestSingleFeature(actionEvent);
+        }
+        else {
             double max = 0;
-            int selectedCounter = 0;
-            for(int counter = 0; counter < data.get(0).features.size(); counter++) {
-                double result = MathOperations.calculateFisher(data, counter);
-                if (result > max && !selectedFeatures.contains(counter)) {
+            List<List<Integer>> possibleCombinations = MathOperations.defineCombinations(data.get(0).features.size(), 2);
+            List<Integer> selectedCombination = new ArrayList<>();
+            for (List<Integer> combination : possibleCombinations) {
+                double result = MathOperations.calculateFisher(data, combination);
+                if (result > max) {
                     max = result;
-                    selectedCounter = counter;
+                    selectedCombination = combination;
                 }
             }
-            selectedFeatures.add(selectedCounter);
+            for (int iteration = 2; iteration < expectedSize; iteration++) {
+                int selectedCounter = 0;
+                max = 0;
+                for (int counter = 0; counter < data.get(0).features.size(); counter++) {
+                    List<Integer> tmpSet = new ArrayList<>();
+                    tmpSet.addAll(selectedCombination);
+                    tmpSet.add(counter);
+                    double result = MathOperations.calculateFisher(data, tmpSet);
+                    if (result > max && !selectedCombination.contains(counter)) {
+                        max = result;
+                        selectedCounter = counter;
+                    }
+                }
+                selectedCombination.add(selectedCounter);
+            }
+            DataStats.getChildren().add(new Text("[SFS} Selected features: " + selectedCombination.toString() + '\n'));
         }
-        DataStats.getChildren().add(new Text("[SFS} Selected features: " + selectedFeatures.toString() + '\n'));
     }
 
     @FXML
