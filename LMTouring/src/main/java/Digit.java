@@ -1,19 +1,8 @@
 public class Digit {
-    int position;
     String value;
 
     Digit(int position, String value){
-        this.position=position;
         this.value=value;
-    }
-    public Digit shiftLeft(){
-        this.position++;
-        return this;
-    }
-
-    public Digit shiftRight(){
-        this.position--;
-        return this;
     }
 
     public Digit plusThree(){

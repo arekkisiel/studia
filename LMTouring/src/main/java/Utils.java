@@ -22,43 +22,33 @@ public class Utils {
     public static String processSeries(String series, TextFlow log) {
         List<Digit> operationalData = prepareData(series);
         int operationalIndex = 0;
-        log.getChildren().add(new Text("State 1: Get first non empty value. \n"));
         operationalIndex = findFirstNonEmptyValue(operationalIndex, operationalData);
         if (operationalIndex == 0) {
             log.getChildren().add(new Text("There are no values! \n"));
             return "3";
         }
-        log.getChildren().add(new Text("Non empty value found at index=" + operationalIndex + "\n"));
-        log.getChildren().add(new Text("State 2: Check sign. \n"));
         if (checkSign(operationalIndex, operationalData)) {
-            log.getChildren().add(new Text("Number is positive. \n"));
             operationalIndex = findEmptyValue(operationalIndex, operationalData);
             if (operationalIndex == 0) {
                 log.getChildren().add(new Text("Something is wrong with processed number! \n"));
                 return "0";
             }
-            log.getChildren().add(new Text("Last empty value found at index=" + operationalIndex + "\n"));
-            log.getChildren().add(new Text("Processing started...\n"));
             operationalIndex = shiftLeft(operationalIndex);
-            log.getChildren().add(new Text("Header at index: " + operationalIndex + "\n"));
+            log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
             if (Integer.valueOf(operationalData.get(operationalIndex).value) >= 0 && Integer.valueOf(operationalData.get(operationalIndex).value) < 7) {
-                log.getChildren().add(new Text("Performing addition.\n"));
                 operationalData.get(operationalIndex).plusThree();
                 return finalConversion(operationalData);
             }
             if (operationalData.get(operationalIndex).value.equals("empty")) {
-                log.getChildren().add(new Text("Performing addition.\n"));
                 operationalData.get(operationalIndex).value = "3";
                 return finalConversion(operationalData);
             }
             if (Integer.valueOf(operationalData.get(operationalIndex).value) >= 7) {
-                log.getChildren().add(new Text("Performing addition of unit values.\n"));
                 operationalData.get(operationalIndex).plusThree();
-                operationalIndex--;
-                log.getChildren().add(new Text("Performing addition of higher tier values.\n"));
+                operationalIndex = shiftLeft(operationalIndex);
                 for (; operationalIndex >= 0; operationalIndex = shiftLeft(operationalIndex)) {
+                    log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
                     if (operationalData.get(operationalIndex).value.equals("empty")) {
-                        log.getChildren().add(new Text("Performing addition.\n"));
                         operationalData.get(operationalIndex).value = "1";
                         return finalConversion(operationalData);
                     }
@@ -70,43 +60,38 @@ public class Utils {
                 }
             }
         } else {
-            log.getChildren().add(new Text("Number is negative. \n"));
             operationalIndex = findEmptyValue(operationalIndex, operationalData);
             if (operationalIndex == 0) {
                 log.getChildren().add(new Text("Something is wrong with processed number! \n"));
                 return "0";
             }
-            log.getChildren().add(new Text("Last empty value found at index=" + operationalIndex + "\n"));
             log.getChildren().add(new Text("Processing started...\n"));
             operationalIndex = shiftLeft(operationalIndex);
-            log.getChildren().add(new Text("Header at index: " + operationalIndex + "\n"));
+            log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
             if (Integer.valueOf(operationalData.get(operationalIndex).value) <= 9 && Integer.valueOf(operationalData.get(operationalIndex).value) > 3) {
-                log.getChildren().add(new Text("Performing addition.\n"));
                 operationalData.get(operationalIndex).minusThree();
                 return finalConversion(operationalData);
             }
             if(operationalData.get(operationalIndex).value.equals("empty")){
-                log.getChildren().add(new Text("Performing addition.\n"));
                 operationalData.get(operationalIndex).value = "3";
                 operationalIndex = shiftLeft(operationalIndex);
+                log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
                 operationalData.get(operationalIndex).value = "empty";
                 return finalConversion(operationalData);
             }
             if(operationalData.get(shiftLeft(operationalIndex)).value.equals("-")){
-                log.getChildren().add(new Text("Changing sign scenario.\n"));
                 operationalData.get(operationalIndex).minusThreeAndSignChange();
                 operationalIndex = shiftLeft(operationalIndex);
+                log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
                 operationalData.get(operationalIndex).value = "empty";
                 return finalConversion(operationalData);
             }
             if (Integer.valueOf(operationalData.get(operationalIndex).value) <= 3) {
-                log.getChildren().add(new Text("Performing addition of unit values.\n"));
                 operationalData.get(operationalIndex).minusThree();
-                log.getChildren().add(new Text("Performing addition of higher tier values.\n"));
                 operationalIndex = shiftLeft(operationalIndex);
                 for (; operationalIndex >= 0; operationalIndex = shiftLeft(operationalIndex)) {
-                    if(operationalData.get(operationalIndex).value.equals("-")){
-                        log.getChildren().add(new Text("Changing sign.\n"));
+                    log.getChildren().add(new Text("Header at index: " + operationalIndex + " Current result: " + finalConversion(operationalData) + "\n"));
+                    if (operationalData.get(operationalIndex).value.equals("-")) {
                         operationalData.get(operationalIndex).value = "empty";
                         return finalConversion(operationalData);
                     }
@@ -118,7 +103,7 @@ public class Utils {
                 }
             }
         }
-        return "Problem.\n";
+        return "Problem";
     }
 
 

@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.TextFlow?>
 
@@ -14,16 +13,14 @@
       <TextArea fx:id="ImportedSeries" layoutX="14.0" layoutY="58.0" prefHeight="200.0" prefWidth="180.0" />
       <Label layoutX="30.0" layoutY="38.0" text="Imported Series" />
       <Button fx:id="CheckAllSeriesButton" layoutX="142.0" layoutY="309.0" mnemonicParsing="false" onAction="#checkAllSeries" text="Check All" />
-      <TextField fx:id="CurrentSeries" layoutX="209.0" layoutY="58.0" />
-      <Label layoutX="209.0" layoutY="38.0" text="Current Series" />
-      <Label layoutX="610.0" layoutY="38.0" text="Operations:" />
-      <ScrollPane fx:id="OperationalResultsScroll" layoutX="610.0" layoutY="58.0" prefHeight="349.0" prefWidth="230.0">
+      <Label layoutX="541.0" layoutY="38.0" text="Operations:" />
+      <ScrollPane fx:id="OperationalResultsScroll" layoutX="541.0" layoutY="58.0" prefHeight="349.0" prefWidth="287.0">
          <content>
-            <TextFlow fx:id="OperationalResults" layoutX="384.0" layoutY="58.0" prefHeight="349.0" prefWidth="232.0" />
+            <TextFlow fx:id="OperationalResults" layoutX="384.0" layoutY="58.0" prefHeight="349.0" prefWidth="276.0" />
          </content>
       </ScrollPane>
-      <Label layoutX="389.0" layoutY="30.0" text="Results:" />
-      <ScrollPane fx:id="FinalResultsScroll" layoutX="389.0" layoutY="58.0" prefHeight="200.0" prefWidth="200.0">
+      <Label layoutX="219.0" layoutY="38.0" text="Results:" />
+      <ScrollPane fx:id="FinalResultsScroll" layoutX="219.0" layoutY="58.0" prefHeight="200.0" prefWidth="287.0">
          <content>
             <TextFlow fx:id="FinalResults" prefHeight="200.0" prefWidth="200.0" />
          </content>
