@@ -30,4 +30,9 @@ public class Digit {
         this.value=String.valueOf(Integer.valueOf(this.value)-1);
         return this;
     }
+
+    public Digit minusOneAndSignChange(){
+        this.value=String.valueOf(Integer.valueOf(this.value)+9);
+        return this;
+    }
 }
