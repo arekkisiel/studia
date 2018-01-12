@@ -1,5 +1,6 @@
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -42,8 +43,6 @@ public class Utils {
         return String.valueOf(counter);
     }
 
-
-
     public static List<Double> getFeatureValues(List<Entry> data, String classType, int featureId) {
         List<Double> resultList = new ArrayList<>();
         for (Entry object : data) {
@@ -64,5 +63,51 @@ public class Utils {
             resultList.add(tempVector);
         }
         return resultList;
+    }
+
+    public static double calculateDistance(Entry testingEntry, Entry trainingEntry, List<Integer> features) {
+        if(features.size() == 0)
+            return 0;
+        if(features.size() == 1)
+            return testingEntry.getFeature(features.get(0)).value-trainingEntry.getFeature(features.get(0)).value;
+        double sumOfSquaredDifferences = 0;
+        for(int featureId : features)
+            sumOfSquaredDifferences += Math.pow(testingEntry.getFeature(featureId).value-trainingEntry.getFeature(featureId).value, 2);
+        return Math.sqrt(sumOfSquaredDifferences);
+    }
+
+    public static double calculateDistance(Entry testingEntry, Vector trainingEntry, List<Integer> features) {
+        if(features.size() == 0)
+            return 0;
+        if(features.size() == 1)
+            return testingEntry.getFeature(features.get(0)).value-Double.parseDouble(trainingEntry.get(features.get(0)).toString());
+        double sumOfSquaredDifferences = 0;
+        int iterator = 0;
+        for(int featureId : features) {
+            sumOfSquaredDifferences += Math.pow(testingEntry.getFeature(featureId).value - Double.parseDouble(trainingEntry.get(iterator).toString()), 2);
+            iterator++;
+        }
+        return Math.sqrt(sumOfSquaredDifferences);
+    }
+
+    public static Pair[] bubbleSort(Pair[] array) {
+        int tempIndex;
+        for (int iterator = array.length; iterator >= 0; iterator--) {
+            for (int i = 0; i < array.length - 1; i++) {
+                tempIndex = i + 1;
+                if (Math.abs(Double.parseDouble(array[i].getValue().toString())) > Math.abs(Double.parseDouble(array[tempIndex].getValue().toString()))) {
+                    swapValues(i, tempIndex, array);
+                }
+            }
+        }
+        return array;
+    }
+
+    private static void swapValues(int i, int j, Pair[] array) {
+
+        Pair<Integer, Double> temp;
+        temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 }

@@ -6,12 +6,17 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class Controller {
     List<Entry> data = new ArrayList<>();
+    List<Entry> trainingSet = new ArrayList<>();
+    List<Entry> testingSet = new ArrayList<>();
+    List<Integer> sfsResults = new ArrayList<>();
 
     @FXML
     private Button LoadDataButton;
@@ -29,6 +34,15 @@ public class Controller {
     private TextArea SetSize2;
 
     @FXML
+    private TextArea SetSize3;
+
+    @FXML
+    private TextArea K;
+
+    @FXML
+    private TextArea GroupAmount;
+
+    @FXML
     public void loadData(ActionEvent actionEvent) {
         ImportedData.clear();
         data = Utils.loadData();
@@ -44,7 +58,7 @@ public class Controller {
     }
 
     @FXML
-    public void selectBestSingleFeature(ActionEvent actionEvent) {
+    public int selectBestSingleFeature(ActionEvent actionEvent) {
         double max = 0;
         int selectedFeatureId = 0;
         for(int counter = 0; counter < data.get(0).features.size(); counter++){
@@ -53,9 +67,10 @@ public class Controller {
                 max = result;
                 selectedFeatureId = counter;
             }
-            DataStats.getChildren().add(new Text("Fisher for feature " + counter + ": " + result + '\n'));
+            //DataStats.getChildren().add(new Text("Fisher for feature " + counter + ": " + result + '\n'));
         }
         DataStats.getChildren().add(new Text("Selected feature id: " + selectedFeatureId + '\n'));
+        return selectedFeatureId;
     }
 
     @FXML
@@ -73,7 +88,7 @@ public class Controller {
                     max = result;
                     selectedCombination = combination;
                 }
-                DataStats.getChildren().add(new Text("Fisher for combination " + combination + ": " + result + '\n'));
+                //DataStats.getChildren().add(new Text("Fisher for combination " + combination + ": " + result + '\n'));
             }
             DataStats.getChildren().add(new Text("Selected combination: " + selectedCombination + '\n'));
         }
@@ -81,10 +96,10 @@ public class Controller {
 
     @FXML
     public void sfsAlgorithm(ActionEvent actionEvent) {
-
+        sfsResults.clear();
         int expectedSize = Integer.parseInt(SetSize2.getText());
         if(expectedSize==1){
-            selectBestSingleFeature(actionEvent);
+            sfsResults.add(selectBestSingleFeature(actionEvent));
         }
         else {
             double max = 0;
@@ -112,7 +127,8 @@ public class Controller {
                 }
                 selectedCombination.add(selectedCounter);
             }
-            DataStats.getChildren().add(new Text("[SFS} Selected features: " + selectedCombination.toString() + '\n'));
+            DataStats.getChildren().add(new Text("[SFS] Selected features: " + selectedCombination.toString() + '\n'));
+            sfsResults.addAll(selectedCombination);
         }
     }
 
@@ -135,6 +151,252 @@ public class Controller {
             alert.setContentText("Please insert only numbers!");
             alert.showAndWait();
             SetSize.clear();
+        }
+    }
+
+    @FXML
+    public void train(ActionEvent actionEvent) {
+        trainingSet.clear();
+        testingSet.clear();
+        int trainingSetSize = Integer.parseInt(SetSize3.getText());
+        if(trainingSetSize % 2 == 0){
+            selectAcer(trainingSetSize/2);
+            selectQuercus(trainingSetSize/2);
+        }
+        else{
+            selectAcer((trainingSetSize-1)/2);
+            selectQuercus((trainingSetSize+1)/2);
+        }
+        DataStats.getChildren().add(new Text("Training set size: " + trainingSet.size() + '\n'));
+        DataStats.getChildren().add(new Text("Testing set size: " + testingSet.size() + '\n'));
+    }
+
+    private void selectQuercus(int trainingSetSize) {
+        int addedProbes = 0;
+        for(Entry entry : data){
+            if(addedProbes<trainingSetSize){
+                if(entry.classType.contains("Quercus")){
+                    trainingSet.add(entry);
+                    addedProbes++;
+                }
+            }
+            else{
+                if(entry.classType.contains("Quercus"))
+                    testingSet.add(entry);
+            }
+        }
+    }
+
+    private void selectAcer(int trainingSetSize) {
+        int addedProbes = 0;
+        for(Entry entry : data){
+            if(addedProbes<trainingSetSize){
+                if(entry.classType.contains("Acer")){
+                    trainingSet.add(entry);
+                    addedProbes++;
+                }
+            }
+            else{
+                if(entry.classType.contains("Acer"))
+                    testingSet.add(entry);
+            }
+        }
+    }
+
+    @FXML
+    public void NNclassification(ActionEvent actionEvent) {
+        double tempDistance;
+        int successfulGuess = 0;
+        int totalProbes = testingSet.size();
+        for(int iterator = 0; iterator < totalProbes; iterator++){
+            double shortestDistance = Utils.calculateDistance(testingSet.get(iterator), trainingSet.get(0), sfsResults);
+            String assignedClassType = trainingSet.get(0).classType;
+            for(int secondIterator = 0; secondIterator < trainingSet.size(); secondIterator++){
+                tempDistance = Utils.calculateDistance(testingSet.get(iterator), trainingSet.get(secondIterator), sfsResults);
+                if(tempDistance < shortestDistance){
+                    shortestDistance = tempDistance;
+                    assignedClassType = trainingSet.get(secondIterator).classType;
+                }
+            }
+            //DataStats.getChildren().add(new Text("Probe number " + iterator + " was classified as " + assignedClassType + " and correct result is " + testingSet.get(iterator).classType + '\n'));
+            if(assignedClassType.contains("Quercus")){
+                if(testingSet.get(iterator).classType.contains("Quercus"))
+                    successfulGuess++;
+            }
+            else {
+                if(testingSet.get(iterator).classType.contains("Acer"))
+                    successfulGuess++;
+            }
+        }
+        double percentage = 100*((double)successfulGuess/totalProbes);
+        DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
+        DataStats.getChildren().add(new Text("NN classificator quality: " + percentage + "%" + '\n'));
+    }
+
+    @FXML
+    public void kNNclassification(ActionEvent actionEvent) {
+        int successfulGuess = 0;
+        int totalProbes = testingSet.size();
+        for(int iterator = 0; iterator < totalProbes; iterator++){
+            Pair distanceTable[] = new Pair[trainingSet.size()];
+            for(int secondIterator = 0; secondIterator < trainingSet.size(); secondIterator++){
+                distanceTable[secondIterator] = new Pair<>(trainingSet.get(secondIterator).classType,Utils.calculateDistance(testingSet.get(iterator), trainingSet.get(secondIterator), sfsResults));
+            }
+            Pair sortedDistanceTable [] = Utils.bubbleSort(distanceTable);
+            //DataStats.getChildren().add(new Text("Probe number " + iterator + " was classified as " + assignedClassType + " and correct result is " + testingSet.get(iterator).classType + '\n'));
+            int k = Integer.parseInt(K.getText());
+            int acerGuess = 0;
+            int quercusGuess = 0;
+            for(Pair entry : sortedDistanceTable){
+                if(acerGuess < k && quercusGuess < k) {
+                    if (entry.getKey().toString().contains("Acer"))
+                        acerGuess++;
+                    if (entry.getKey().toString().contains("Quercus"))
+                        quercusGuess++;
+                }
+            }
+            String assignedClassType;
+            if(acerGuess == k)
+                assignedClassType = "Acer";
+            else
+                assignedClassType = "Quercus";
+            if(assignedClassType.contains("Quercus")){
+                if(testingSet.get(iterator).classType.contains("Quercus"))
+                    successfulGuess++;
+            }
+            else {
+                if(testingSet.get(iterator).classType.contains("Acer"))
+                    successfulGuess++;
+            }
+        }
+        double percentage = 100*((double)successfulGuess/totalProbes);
+        DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
+        DataStats.getChildren().add(new Text("k-NN classificator quality: " + percentage + "%" + '\n'));
+    }
+
+    @FXML
+    public void NMclassification(ActionEvent actionEvent) {
+        int successfulGuess = 0;
+        int totalProbes = testingSet.size();
+
+        List<Vector<Double>> referenceAcerValues = Utils.getFeatureValues(trainingSet, "Acer", sfsResults);
+        List<Vector<Double>> referenceQuercusValues = Utils.getFeatureValues(trainingSet, "Quercus", sfsResults);
+
+        Vector<Double> acerAvg = MathOperations.calculateAverageVector(referenceAcerValues);
+        Vector<Double> quercusAvg = MathOperations.calculateAverageVector(referenceQuercusValues);
+        for(int iterator = 0; iterator < testingSet.size(); iterator++){
+            Double acerAvgDistance = Utils.calculateDistance(testingSet.get(iterator), acerAvg, sfsResults);
+            Double quercusAvgDistance = Utils.calculateDistance(testingSet.get(iterator), quercusAvg, sfsResults);
+            if(acerAvgDistance < quercusAvgDistance) {
+                if (testingSet.get(iterator).classType.contains("Acer"))
+                    successfulGuess++;
+            }
+            if(quercusAvgDistance < acerAvgDistance){
+                if (testingSet.get(iterator).classType.contains("Quercus"))
+                    successfulGuess++;
+            }
+        }
+        double percentage = 100*((double)successfulGuess/totalProbes);
+        DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
+        DataStats.getChildren().add(new Text("NM classificator quality: " + percentage + "%" + '\n'));
+    }
+
+    @FXML
+    public void NNCrossValidation(ActionEvent actionEvent) {
+        int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
+        int numberOfBiggerGroups = data.size() % numberOfGroups;
+        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
+        List groupTable[] = new List[numberOfGroups];
+        for(int index = 0; index < numberOfBiggerGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
+                tmpList.add(data.get((index*biggerGroupSize)+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
+                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = 0; index < numberOfGroups; index++){
+            testingSet.clear();
+            trainingSet.clear();
+            trainingSet.addAll(groupTable[index]);
+            for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
+                if(secondaryIndex != index)
+                    testingSet.addAll(groupTable[secondaryIndex]);
+            }
+            DataStats.getChildren().add(new Text("Group " + (index+1) + '\n'));
+            NNclassification(actionEvent);
+        }
+    }
+
+    @FXML
+    public void NMCrossValidation(ActionEvent actionEvent) {
+        int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
+        int numberOfBiggerGroups = data.size() % numberOfGroups;
+        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
+        List groupTable[] = new List[numberOfGroups];
+        for(int index = 0; index < numberOfBiggerGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
+                tmpList.add(data.get((index*biggerGroupSize)+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
+                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = 0; index < numberOfGroups; index++){
+            testingSet.clear();
+            trainingSet.clear();
+            trainingSet.addAll(groupTable[index]);
+            for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
+                if(secondaryIndex != index)
+                    testingSet.addAll(groupTable[secondaryIndex]);
+            }
+            DataStats.getChildren().add(new Text("Group " + index+1 + '\n'));
+            NMclassification(actionEvent);
+        }
+    }
+
+    @FXML
+    public void kNNCrossValidation(ActionEvent actionEvent) {
+        int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
+        int numberOfBiggerGroups = data.size() % numberOfGroups;
+        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
+        List groupTable[] = new List[numberOfGroups];
+        for(int index = 0; index < numberOfBiggerGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
+                tmpList.add(data.get((index*biggerGroupSize)+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
+                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        for(int index = 0; index < numberOfGroups; index++){
+            testingSet.clear();
+            trainingSet.clear();
+            trainingSet.addAll(groupTable[index]);
+            for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
+                if(secondaryIndex != index)
+                    testingSet.addAll(groupTable[secondaryIndex]);
+            }
+            DataStats.getChildren().add(new Text("Group " + index+1 + '\n'));
+            kNNclassification(actionEvent);
         }
     }
 }

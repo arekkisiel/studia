@@ -156,7 +156,7 @@ public class MathOperations {
         return sum/values.size();
     }
 
-    private static Vector<Double> calculateAverageVector(List<Vector<Double>> values) {
+    public static Vector<Double> calculateAverageVector(List<Vector<Double>> values) {
         Vector<Double> avgVector = new Vector<>();
         for(Vector<Double> featureValues : values) {
             double sum = 0;
