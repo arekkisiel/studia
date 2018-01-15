@@ -242,21 +242,36 @@ public class Controller {
             for(int secondIterator = 0; secondIterator < trainingSet.size(); secondIterator++){
                 distanceTable[secondIterator] = new Pair<>(trainingSet.get(secondIterator).classType,Utils.calculateDistance(testingSet.get(iterator), trainingSet.get(secondIterator), sfsResults));
             }
-            Pair sortedDistanceTable [] = Utils.bubbleSort(distanceTable);
+            //Pair sortedDistanceTable [] = Utils.bubbleSort(distanceTable);
             //DataStats.getChildren().add(new Text("Probe number " + iterator + " was classified as " + assignedClassType + " and correct result is " + testingSet.get(iterator).classType + '\n'));
             int k = Integer.parseInt(K.getText());
-            int acerGuess = 0;
-            int quercusGuess = 0;
-            for(Pair entry : sortedDistanceTable){
-                if(acerGuess < k && quercusGuess < k) {
-                    if (entry.getKey().toString().contains("Acer"))
-                        acerGuess++;
-                    if (entry.getKey().toString().contains("Quercus"))
-                        quercusGuess++;
+            Pair closestNeighbours[] = new Pair[k];
+            for(int index=0; index < k; index++)
+                closestNeighbours[index] = new Pair("Temp", 1000);
+            for(Pair distance : distanceTable) {
+                boolean inserted = false;
+                for (int index = 0; index < k; index++){
+                    if(!inserted) {
+                        if (Double.parseDouble(distance.getValue().toString()) < Double.parseDouble(closestNeighbours[index].getValue().toString())) {
+                            for (int secondaryIndex = k - 1; secondaryIndex > 1; secondaryIndex--) {
+                                closestNeighbours[secondaryIndex - 1] = closestNeighbours[secondaryIndex - 2];
+                            }
+                            closestNeighbours[index] = distance;
+                            inserted = true;
+                        }
+                    }
                 }
             }
+            int acerGuess = 0;
+            int quercusGuess = 0;
+            for(Pair entry : closestNeighbours){
+                if(entry.getKey().toString().contains("Acer"))
+                        acerGuess++;
+                if(entry.getKey().toString().contains("Quercus"))
+                        quercusGuess++;
+            }
             String assignedClassType;
-            if(acerGuess == k)
+            if(acerGuess > quercusGuess)
                 assignedClassType = "Acer";
             else
                 assignedClassType = "Quercus";
