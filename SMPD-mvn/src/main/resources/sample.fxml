@@ -31,21 +31,21 @@
       <Label layoutX="268.0" layoutY="297.0" text="Task 2" />
       <Label layoutX="280.0" layoutY="322.0" text="Define set size (from 1 to 64):" />
       <Button layoutX="280.0" layoutY="391.0" mnemonicParsing="false" onAction="#sfsAlgorithm" prefHeight="25.0" prefWidth="156.0" text="SFS" />
-      <TextArea fx:id="SetSize2" layoutX="279.0" layoutY="339.0" onKeyReleased="#verifyInput" prefHeight="38.0" prefWidth="165.0" text="1" />
+      <TextArea fx:id="SetSize2" layoutX="279.0" layoutY="339.0" onKeyReleased="#verifyInputSFS" prefHeight="38.0" prefWidth="165.0" text="1" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#c0c3c6" height="154.0" layoutX="266.0" layoutY="460.0" stroke="BLACK" strokeType="INSIDE" width="267.0" />
       <Label layoutX="268.0" layoutY="443.0" text="Task 3" />
-      <TextArea fx:id="SetSize3" layoutX="275.0" layoutY="479.0" onKeyReleased="#verifyInput" prefHeight="38.0" prefWidth="165.0" text="1" />
+      <TextArea fx:id="SetSize3" layoutX="275.0" layoutY="479.0" onKeyReleased="#verifyInputTrainingSetSize" prefHeight="38.0" prefWidth="165.0" text="1" />
       <Label layoutX="275.0" layoutY="460.0" text="Define size of training group:" />
       <Button layoutX="444.0" layoutY="486.0" mnemonicParsing="false" onAction="#train" prefHeight="25.0" prefWidth="77.0" text="Train" />
       <Button layoutX="361.0" layoutY="541.0" mnemonicParsing="false" onAction="#NNclassification" prefHeight="25.0" prefWidth="77.0" text="NN" />
       <Button layoutX="400.0" layoutY="579.0" mnemonicParsing="false" onAction="#kNNclassification" prefHeight="25.0" prefWidth="77.0" text="K-NN" />
       <Button layoutX="444.0" layoutY="541.0" mnemonicParsing="false" onAction="#NMclassification" prefHeight="25.0" prefWidth="77.0" text="NM" />
-      <TextArea fx:id="K" layoutX="274.0" layoutY="541.0" onKeyReleased="#verifyInput" prefHeight="38.0" prefWidth="77.0" text="1" />
+      <TextArea fx:id="K" layoutX="274.0" layoutY="541.0" onKeyReleased="#verifyInputK" prefHeight="38.0" prefWidth="77.0" text="1" />
       <Label layoutX="280.0" layoutY="524.0" text="K:" />
       <Label layoutX="269.0" layoutY="624.0" text="Task 4" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#c0c3c6" height="113.0" layoutX="269.0" layoutY="641.0" stroke="BLACK" strokeType="INSIDE" width="267.0" />
       <Label layoutX="283.0" layoutY="648.0" text="Define number of groups:" />
-      <TextArea fx:id="GroupAmount" layoutX="279.0" layoutY="665.0" onKeyReleased="#verifyInput" prefHeight="38.0" prefWidth="156.0" text="1" />
+      <TextArea fx:id="GroupAmount" layoutX="279.0" layoutY="665.0" onKeyReleased="#verifyInputGroups" prefHeight="38.0" prefWidth="156.0" text="1" />
       <Button layoutX="280.0" layoutY="714.0" mnemonicParsing="false" onAction="#NNCrossValidation" prefHeight="25.0" prefWidth="70.0" text="NN" />
       <Button layoutX="365.0" layoutY="714.0" mnemonicParsing="false" onAction="#NMCrossValidation" prefHeight="25.0" prefWidth="70.0" text="NM" />
       <Button layoutX="448.0" layoutY="714.0" mnemonicParsing="false" onAction="#kNNCrossValidation" prefHeight="25.0" prefWidth="70.0" text="K-NN" />

@@ -67,7 +67,6 @@ public class Controller {
                 max = result;
                 selectedFeatureId = counter;
             }
-            //DataStats.getChildren().add(new Text("Fisher for feature " + counter + ": " + result + '\n'));
         }
         DataStats.getChildren().add(new Text("Selected feature id: " + selectedFeatureId + '\n'));
         return selectedFeatureId;
@@ -88,7 +87,6 @@ public class Controller {
                     max = result;
                     selectedCombination = combination;
                 }
-                //DataStats.getChildren().add(new Text("Fisher for combination " + combination + ": " + result + '\n'));
             }
             DataStats.getChildren().add(new Text("Selected combination: " + selectedCombination + '\n'));
         }
@@ -155,56 +153,130 @@ public class Controller {
     }
 
     @FXML
+    public void verifyInputK(KeyEvent keyEvent) {
+        try {
+            int input = Integer.parseInt(K.getText());
+            if(!(input > 0 && input < 65)){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Invalid input");
+                alert.setContentText("Please insert only numbers from 1 to 64!");
+                alert.showAndWait();
+                K.clear();
+            }
+        } catch(NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Invalid input");
+            alert.setContentText("Please insert only numbers!");
+            alert.showAndWait();
+            K.clear();
+        }
+    }
+
+    @FXML
+    public void verifyInputSFS(KeyEvent keyEvent) {
+        try {
+            int input = Integer.parseInt(SetSize2.getText());
+            if(!(input > 0 && input < 65)){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Invalid input");
+                alert.setContentText("Please insert only numbers from 1 to 64!");
+                alert.showAndWait();
+                SetSize2.clear();
+            }
+        } catch(NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Invalid input");
+            alert.setContentText("Please insert only numbers!");
+            alert.showAndWait();
+            SetSize2.clear();
+        }
+    }
+
+    @FXML
+    public void verifyInputTrainingSetSize(KeyEvent keyEvent) {
+        try {
+            int input = Integer.parseInt(SetSize3.getText());
+            if(!(input > 0 && input <= data.size())){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Invalid input");
+                alert.setContentText("Please insert only numbers from range of available entries!");
+                alert.showAndWait();
+                SetSize3.clear();
+            }
+        } catch(NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Invalid input");
+            alert.setContentText("Please insert only numbers!");
+            alert.showAndWait();
+            SetSize3.clear();
+        }
+    }
+
+    @FXML
+    public void verifyInputGroups(KeyEvent keyEvent) {
+        try {
+            int input = Integer.parseInt(GroupAmount.getText());
+            if(!(input > 0 && input <= data.size())){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Invalid input");
+                alert.setContentText("Please insert only numbers from range of available entries!");
+                alert.showAndWait();
+                GroupAmount.clear();
+            }
+        } catch(NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Invalid input");
+            alert.setContentText("Please insert only numbers!");
+            alert.showAndWait();
+            GroupAmount.clear();
+        }
+    }
+
+    @FXML
     public void train(ActionEvent actionEvent) {
         trainingSet.clear();
         testingSet.clear();
         int trainingSetSize = Integer.parseInt(SetSize3.getText());
-        if(trainingSetSize % 2 == 0){
-            selectAcer(trainingSetSize/2);
-            selectQuercus(trainingSetSize/2);
+        for(int index=0; index<trainingSetSize; index++){
+            trainingSet.add(data.get(index));
         }
-        else{
-            selectAcer((trainingSetSize-1)/2);
-            selectQuercus((trainingSetSize+1)/2);
+        for(int index=trainingSetSize; index<data.size(); index++){
+            testingSet.add(data.get(index));
         }
         DataStats.getChildren().add(new Text("Training set size: " + trainingSet.size() + '\n'));
         DataStats.getChildren().add(new Text("Testing set size: " + testingSet.size() + '\n'));
     }
 
-    private void selectQuercus(int trainingSetSize) {
-        int addedProbes = 0;
+    private List<Entry> selectQuercus() {
+        List<Entry> quercusData = new ArrayList<>();
         for(Entry entry : data){
-            if(addedProbes<trainingSetSize){
-                if(entry.classType.contains("Quercus")){
-                    trainingSet.add(entry);
-                    addedProbes++;
-                }
-            }
-            else{
-                if(entry.classType.contains("Quercus"))
-                    testingSet.add(entry);
+            if(entry.classType.contains("Quercus")){
+                quercusData.add(entry);
             }
         }
+        return quercusData;
     }
 
-    private void selectAcer(int trainingSetSize) {
-        int addedProbes = 0;
+    private List<Entry> selectAcer() {
+        List<Entry> acerData = new ArrayList<>();
         for(Entry entry : data){
-            if(addedProbes<trainingSetSize){
-                if(entry.classType.contains("Acer")){
-                    trainingSet.add(entry);
-                    addedProbes++;
-                }
-            }
-            else{
-                if(entry.classType.contains("Acer"))
-                    testingSet.add(entry);
+            if(entry.classType.contains("Acer")){
+                acerData.add(entry);
             }
         }
+        return acerData;
     }
 
     @FXML
-    public void NNclassification(ActionEvent actionEvent) {
+    public double NNclassification(ActionEvent actionEvent) {
         double tempDistance;
         int successfulGuess = 0;
         int totalProbes = testingSet.size();
@@ -218,7 +290,6 @@ public class Controller {
                     assignedClassType = trainingSet.get(secondIterator).classType;
                 }
             }
-            //DataStats.getChildren().add(new Text("Probe number " + iterator + " was classified as " + assignedClassType + " and correct result is " + testingSet.get(iterator).classType + '\n'));
             if(assignedClassType.contains("Quercus")){
                 if(testingSet.get(iterator).classType.contains("Quercus"))
                     successfulGuess++;
@@ -231,10 +302,11 @@ public class Controller {
         double percentage = 100*((double)successfulGuess/totalProbes);
         DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
         DataStats.getChildren().add(new Text("NN classificator quality: " + percentage + "%" + '\n'));
+        return percentage;
     }
 
     @FXML
-    public void kNNclassification(ActionEvent actionEvent) {
+    public double kNNclassification(ActionEvent actionEvent) {
         int successfulGuess = 0;
         int totalProbes = testingSet.size();
         for(int iterator = 0; iterator < totalProbes; iterator++){
@@ -287,10 +359,11 @@ public class Controller {
         double percentage = 100*((double)successfulGuess/totalProbes);
         DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
         DataStats.getChildren().add(new Text("k-NN classificator quality: " + percentage + "%" + '\n'));
+        return percentage;
     }
 
     @FXML
-    public void NMclassification(ActionEvent actionEvent) {
+    public double NMclassification(ActionEvent actionEvent) {
         int successfulGuess = 0;
         int totalProbes = testingSet.size();
 
@@ -314,104 +387,83 @@ public class Controller {
         double percentage = 100*((double)successfulGuess/totalProbes);
         DataStats.getChildren().add(new Text("Successful guesses: " + successfulGuess + " out of " + testingSet.size() + '\n'));
         DataStats.getChildren().add(new Text("NM classificator quality: " + percentage + "%" + '\n'));
+        return percentage;
     }
 
     @FXML
     public void NNCrossValidation(ActionEvent actionEvent) {
         int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
-        int numberOfBiggerGroups = data.size() % numberOfGroups;
-        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
-        List groupTable[] = new List[numberOfGroups];
-        for(int index = 0; index < numberOfBiggerGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
-                tmpList.add(data.get((index*biggerGroupSize)+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
-        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
-                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
+        List groupTable[] = createGroupsForCrossValidation();
+        double avgPercentage = 0;
         for(int index = 0; index < numberOfGroups; index++){
             testingSet.clear();
             trainingSet.clear();
-            trainingSet.addAll(groupTable[index]);
+            testingSet.addAll(groupTable[index]);
             for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
                 if(secondaryIndex != index)
-                    testingSet.addAll(groupTable[secondaryIndex]);
+                    trainingSet.addAll(groupTable[secondaryIndex]);
             }
             DataStats.getChildren().add(new Text("Group " + (index+1) + '\n'));
-            NNclassification(actionEvent);
+            avgPercentage+=NNclassification(actionEvent);
         }
+        DataStats.getChildren().add(new Text("Average NN classificator quality: " + (avgPercentage/numberOfGroups) + "%" + '\n'));
     }
 
     @FXML
     public void NMCrossValidation(ActionEvent actionEvent) {
         int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
-        int numberOfBiggerGroups = data.size() % numberOfGroups;
-        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
-        List groupTable[] = new List[numberOfGroups];
-        for(int index = 0; index < numberOfBiggerGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
-                tmpList.add(data.get((index*biggerGroupSize)+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
-        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
-                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
+        List groupTable[] = createGroupsForCrossValidation();
+        double avgPercentage = 0;
         for(int index = 0; index < numberOfGroups; index++){
             testingSet.clear();
             trainingSet.clear();
-            trainingSet.addAll(groupTable[index]);
+            testingSet.addAll(groupTable[index]);
             for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
                 if(secondaryIndex != index)
-                    testingSet.addAll(groupTable[secondaryIndex]);
+                    trainingSet.addAll(groupTable[secondaryIndex]);
             }
-            DataStats.getChildren().add(new Text("Group " + index+1 + '\n'));
-            NMclassification(actionEvent);
+            DataStats.getChildren().add(new Text("Group " + (index+1) + '\n'));
+            avgPercentage+=NMclassification(actionEvent);
         }
+        DataStats.getChildren().add(new Text("Average NM classificator quality: " + (avgPercentage/numberOfGroups) + "%" + '\n'));
     }
 
     @FXML
     public void kNNCrossValidation(ActionEvent actionEvent) {
         int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
-        int numberOfBiggerGroups = data.size() % numberOfGroups;
-        int biggerGroupSize = ((data.size() - numberOfBiggerGroups) / numberOfGroups)+1;
-        List groupTable[] = new List[numberOfGroups];
-        for(int index = 0; index < numberOfBiggerGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < biggerGroupSize; iterator++){
-                tmpList.add(data.get((index*biggerGroupSize)+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
-        for(int index = numberOfBiggerGroups; index < numberOfGroups; index++){
-            List tmpList = new ArrayList();
-            for(int iterator = 0; iterator < (biggerGroupSize-1); iterator++){
-                tmpList.add(data.get(((numberOfBiggerGroups*biggerGroupSize)+(index-numberOfBiggerGroups)*(biggerGroupSize-1))+iterator));
-            }
-            groupTable[index] = tmpList;
-        }
+        List groupTable[] = createGroupsForCrossValidation();
+        double avgPercentage = 0;
         for(int index = 0; index < numberOfGroups; index++){
             testingSet.clear();
             trainingSet.clear();
-            trainingSet.addAll(groupTable[index]);
+            testingSet.addAll(groupTable[index]);
             for(int secondaryIndex = 0; secondaryIndex < numberOfGroups; secondaryIndex++){
                 if(secondaryIndex != index)
-                    testingSet.addAll(groupTable[secondaryIndex]);
+                    trainingSet.addAll(groupTable[secondaryIndex]);
             }
-            DataStats.getChildren().add(new Text("Group " + index+1 + '\n'));
-            kNNclassification(actionEvent);
+            DataStats.getChildren().add(new Text("Group " + (index+1) + '\n'));
+            avgPercentage+=kNNclassification(actionEvent);
         }
+        DataStats.getChildren().add(new Text("Average K-NN classificator quality: " + (avgPercentage/numberOfGroups) + "%" + '\n'));
+    }
+
+    public List[] createGroupsForCrossValidation() {
+        List<Entry> acerData = selectAcer();
+        List<Entry> quercusData = selectQuercus();
+        int numberOfGroups = Integer.parseInt(GroupAmount.getText().toString());
+        int acerGroupSize = acerData.size()/numberOfGroups;
+        int quercusGroupSize = quercusData.size()/numberOfGroups;
+        List groupTable[] = new List[numberOfGroups];
+        for(int index = 0; index < numberOfGroups; index++){
+            List tmpList = new ArrayList();
+            for(int iterator = 0; iterator <= acerGroupSize; iterator++){
+                tmpList.add(acerData.get((index*acerGroupSize)+iterator));
+            }
+            for(int iterator = 0; iterator <= quercusGroupSize; iterator++){
+                tmpList.add(quercusData.get((index*quercusGroupSize)+iterator));
+            }
+            groupTable[index] = tmpList;
+        }
+        return groupTable;
     }
 }

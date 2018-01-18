@@ -1,6 +1,5 @@
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -17,7 +16,7 @@ public class Utils {
         CsvParserSettings settings = new CsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
         CsvParser parser = new CsvParser(settings);
-        List<String[]> allRows = parser.parseAll(getReader("G:\\repos\\studia\\SMPD-mvn\\src\\main\\resources\\Maple_Oak.txt"));
+        List<String[]> allRows = parser.parseAll(getReader("E:\\repos\\studia\\SMPD-mvn\\src\\main\\resources\\Maple_Oak.txt"));
         for(String[] row:allRows.subList(1,allRows.size())){
             listOfEntries.add(new Entry(row));
         }
@@ -88,26 +87,5 @@ public class Utils {
             iterator++;
         }
         return Math.sqrt(sumOfSquaredDifferences);
-    }
-
-    public static Pair[] bubbleSort(Pair[] array) {
-        int tempIndex;
-        for (int iterator = array.length; iterator >= 0; iterator--) {
-            for (int i = 0; i < array.length - 1; i++) {
-                tempIndex = i + 1;
-                if (Math.abs(Double.parseDouble(array[i].getValue().toString())) > Math.abs(Double.parseDouble(array[tempIndex].getValue().toString()))) {
-                    swapValues(i, tempIndex, array);
-                }
-            }
-        }
-        return array;
-    }
-
-    private static void swapValues(int i, int j, Pair[] array) {
-
-        Pair<Integer, Double> temp;
-        temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
     }
 }
