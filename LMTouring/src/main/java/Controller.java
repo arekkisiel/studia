@@ -36,9 +36,22 @@ public class Controller {
     public void checkAllSeries(ActionEvent actionEvent) throws InterruptedException {
         String[] seriesList = ImportedSeries.getText().split("\\s");
         for (String series : seriesList) {
-            String processedSeries = Utils.processSeriesStates(series, OperationalResults);
-            OperationalResults.getChildren().add(new Text("Series after addition: " + processedSeries + "\n"));
-            FinalResults.getChildren().add(new Text(series + " + 3 = " + processedSeries + "\n"));
+            if(isSeriesValid(series)) {
+                String processedSeries = Utils.processSeriesStates(series, OperationalResults);
+                OperationalResults.getChildren().add(new Text("Series after addition: " + processedSeries + "\n"));
+                FinalResults.getChildren().add(new Text(series + " + 3 = " + processedSeries + "\n"));
+            }
+        }
+    }
+
+    private boolean isSeriesValid(String series) {
+        try {
+            Integer.parseInt(series);
+            return true;
+        }
+        catch (NumberFormatException e){
+            System.out.println("Series " + series + " is invalid and will not be processed.");
+            return false;
         }
     }
 }
