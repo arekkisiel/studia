@@ -31,6 +31,17 @@ public class Utils {
         return String.join("", finalResult);
     }
 
+    private static String tmpConversion(List<Digit> operationalData) {
+        List<String> finalResult = new ArrayList<>();
+        for(int index = 0; index<operationalData.size();index++){
+            if(!operationalData.get(index).value.equals("empty"))
+                finalResult.add(operationalData.get(index).value);
+            else
+                finalResult.add("∅");
+        }
+        return String.join("", finalResult);
+    }
+
     public static String processSeriesStates(String series, TextFlow log) {
         int state = INITIAL_STATE;
         List<Digit> operationalData = prepareData(series);
@@ -147,9 +158,14 @@ public class Utils {
                         operationalIndex = shiftLeft(operationalIndex);
                         break;
                     }
-                    if (Integer.valueOf(currentInput.value) >= 1 && Integer.valueOf(currentInput.value) <= 9) {
+                    if (Integer.valueOf(currentInput.value) >= 2 && Integer.valueOf(currentInput.value) <= 9) {
                         state = FINAL_STATE;
                         operationalData.get(operationalIndex).minusOne();
+                        break;
+                    }
+                    if (Integer.valueOf(currentInput.value) == 1) {
+                        state = FINAL_STATE;
+                        operationalData.get(operationalIndex).value = "empty";
                         break;
                     }
                 case 8: //final
@@ -174,6 +190,7 @@ public class Utils {
                     break;
             }
         }
+        printData(state, operationalIndex, operationalData, log);
         return finalConversion(operationalData);
     }
 
@@ -195,6 +212,6 @@ public class Utils {
     }
 
     private static void printData(int state, int operationalIndex, List<Digit> tape, TextFlow log){
-        log.getChildren().add(new Text("State: " + state + " Header: " + operationalIndex + " Tape: " + finalConversion(tape) + "\n"));
+        log.getChildren().add(new Text("State: " + state + " Header: " + operationalIndex + " Tape: " + tmpConversion(tape) + "\n"));
     }
 }
