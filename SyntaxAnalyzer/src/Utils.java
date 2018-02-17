@@ -39,7 +39,11 @@ public class Utils {
         while(PRODUCTION.length() > 0){
             if(INPUT.length() == 0)
                 INPUT = "$";
-            String partial_production = (fitProduction(first(INPUT), first(PRODUCTION)));
+            String partial_production;
+            if(isAlphabet(first(INPUT)))
+                 partial_production = (fitProduction(first(INPUT), first(PRODUCTION)));
+            else
+                partial_production = "INVALID";
             if(partial_production.equals("INVALID"))
                 return false;
             PRODUCTION = partial_production.concat(PRODUCTION.substring(1));
@@ -51,6 +55,24 @@ public class Utils {
         if(PRODUCTION.length() == 0 && INPUT.length() > 0)
             return false;
         return true;
+    }
+
+    private static boolean isAlphabet(String first) {
+        if(isOperator(first))
+            return true;
+        if(isDigit(first))
+            return true;
+        if(isZero(first))
+            return true;
+        if(first.contains("("))
+            return true;
+        if(first.contains(")"))
+            return true;
+        if(first.contains("$"))
+            return true;
+        if(first.contains("."))
+            return true;
+        return false;
     }
 
     private static boolean dropIfEqual() {
