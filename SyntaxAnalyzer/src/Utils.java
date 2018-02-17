@@ -8,16 +8,6 @@ import java.util.Scanner;
 public class Utils {
     private static String PRODUCTION;
     private static String INPUT;
-    /*PRODUCTIONS
-    S = AFAE | (S)E
-    A = CB | (-CB)
-    B = ,C |  $
-    C = 0D | GD
-    D = 0D | GD | $
-    E = FS | $
-    F = +|-|*|/|^
-    G = 1|2|3|4|5|6|7|8|9
-    */
 
     public static Scanner loadData() {
         Scanner read = null;
