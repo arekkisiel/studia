@@ -1,22 +1,38 @@
 package com.company;
 
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) {
-        ServerSocket server_socket;
-        Socket client_socket;
-        try {
-            server_socket = new ServerSocket(6000);
-            client_socket = server_socket.accept();
-            System.out.println("Zglosil sie klient");
-        }
-        catch (Exception e) {
-            System.err.println( e.getMessage() );
-            e.printStackTrace();
-        }
 
+        startServer(args);
+        connectClient(args);
+    }
+
+    private static void connectClient(String[] args) {
+        new Thread(() -> {
+            try {
+                Client.main("G:\\repos\\studia\\MyDropbox\\Clients\\");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private static void startServer(String[] args) {
+        new Thread(() -> {
+            try {
+                Server.main("G:\\repos\\studia\\MyDropbox\\Server\\");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
