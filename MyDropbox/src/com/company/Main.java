@@ -5,12 +5,19 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-
-        startServer(args);
-        connectClient(args);
+        try {
+            Handler.main();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        startServer();
+        connectClient();
     }
 
-    private static void connectClient(String[] args) {
+
+    private static void connectClient() {
         new Thread(() -> {
             try {
                 Client.main("G:\\repos\\studia\\MyDropbox\\Clients\\");
@@ -24,7 +31,7 @@ public class Main {
         }).start();
     }
 
-    private static void startServer(String[] args) {
+    private static void startServer() {
         new Thread(() -> {
             try {
                 Server.main("G:\\repos\\studia\\MyDropbox\\Server\\");

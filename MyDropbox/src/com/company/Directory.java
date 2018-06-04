@@ -13,7 +13,7 @@ public class Directory {
         this.directoryPath = Paths.get(directoryPath);
     }
 
-    public String checkDirectory() throws IOException {
+    public String checkDirectory(){
         WatchService watcher = null;
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -38,7 +38,11 @@ public class Directory {
                 }
                 if (kind == ENTRY_CREATE) {
                     key.cancel();
-                    watcher.close();
+                    try {
+                        watcher.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     return event.context().toString();
                 }
             }
