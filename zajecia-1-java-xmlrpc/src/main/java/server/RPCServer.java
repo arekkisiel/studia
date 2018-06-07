@@ -12,12 +12,13 @@ import java.io.IOException;
 
 public class RPCServer implements IHandler{
 
-
     public String getWinner(String board) {
         if(isWinner(board,'X'))
             return "X";
         if(isWinner(board,'O'))
             return "O";
+        if(!board.contains("I"))
+            return "T";
         return "I";
     }
 
