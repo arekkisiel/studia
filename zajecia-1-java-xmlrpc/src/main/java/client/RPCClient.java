@@ -1,30 +1,29 @@
 package client;
 
+import core.Action;
 import core.IHandler;
-import org.apache.xmlrpc.XmlRpcRequest;
-import org.apache.xmlrpc.client.AsyncCallback;
-import org.apache.xmlrpc.client.TimingOutCallback;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.util.ClientFactory;
 
-import java.net.MalformedURLException;
+import com.google.gson.Gson;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class RPCClient {
 
     private static String tmpBoard;
-//    private static String tmpBoard;
+    private static String requestData;
+
     public static void printBoard(String board) {
         System.out.println("Current game board:");
         System.out.println("" + board.substring(6,9));
         System.out.println("" + board.substring(3,6));
         System.out.println("" + board.substring(0,3));
-//        System.out.println("" + tmpBoard[6] + tmpBoard[7] + tmpBoard[8]);
-//        System.out.println("" + tmpBoard[3] + tmpBoard[4] + tmpBoard[5]);
-//        System.out.println("" + tmpBoard[0] + tmpBoard[1] + tmpBoard[2]);
+    }
+
+    public static void initializeBoard() {
+        tmpBoard = "IIIIIIIII";
     }
 
     public static void main(String[] args) throws Throwable {
@@ -41,45 +40,34 @@ public class RPCClient {
         ClientFactory factory = new ClientFactory(client);
 
         IHandler handler = (IHandler)factory.newInstance(IHandler.class);
-        tmpBoard = handler.updateBoard("IIIIIIIII");
+
+        Gson gson = new Gson();
         Scanner keyboard = new Scanner(System.in);
         int input;
         String winner = "I";
+
+        initializeBoard();
         while(winner.contains("I")) {
-            printBoard(handler.getBoard());
+            printBoard(tmpBoard);
             input = 0;
             while (input < 1 || input > 9) {
                 System.out.println("Player X: Enter field number (from 1 to 9):");
                 input = keyboard.nextInt();
             }
-            int low = input-1;
-            tmpBoard = tmpBoard.substring(0, low) + 'X' + tmpBoard.substring(input);
-            handler.updateBoard(tmpBoard);
-            winner = handler.whoIsWinner();
+            requestData = gson.toJson(new Action(input, "X", tmpBoard));
+            tmpBoard = handler.updateBoard(requestData);
+            winner = handler.getWinner(tmpBoard);
             if(winner.contains("I")) {
-                printBoard(handler.getBoard());
+                printBoard(tmpBoard);
                 input = 0;
                 while (input < 1 || input > 9) {
                     System.out.println("Player O: Enter field number (from 1 to 9):");
                     input = keyboard.nextInt();
                 }
-                low = input-1;
-                tmpBoard = tmpBoard.substring(0, low) + 'O' + tmpBoard.substring(input);
-                handler.updateBoard(tmpBoard);
-                winner = handler.whoIsWinner();
+                requestData = gson.toJson(new Action(input, "O", tmpBoard));
+                tmpBoard = handler.updateBoard(requestData);
+                winner = handler.getWinner(tmpBoard);
             }
         }
-//            handler.updateBoard(tmpBoard);
-//            printBoard();
-//            if(true){
-//                input = 0;
-//                while(input < 1 || input > 9) {
-//                    System.out.println("Player O: Enter field number (from 1 to 9):");
-//                    input = keyboard.nextInt();
-//                }
-//                tmpBoard[--input] = 'O';
-//                handler.updateBoard(tmpBoard);
-//            }
-//        }
     }
 }

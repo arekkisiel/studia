@@ -6,9 +6,7 @@ public interface IHandler {
 //    void playerMove(int fieldId, char playerSignature);
 //    boolean isFinished();
 //    void printBoard();
-    String getBoard();
-    String whoIsWinner();
-    String updateBoard(String board);
-
-
+    String getWinner(String board);
+//    void initializeNewBoard();
+    String updateBoard(String jsonAction);
 }
