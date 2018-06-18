@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Client {
 
     public static void main(String[] args) throws Exception {
-        String path = "G:\\repos\\studia\\MyDropbox\\Clients\\";
+        String path = "E:\\repos\\studia\\MyDropbox\\Clients\\";
         Socket socket = new Socket("127.0.0.1", 8000);
         String pathPort = path + socket.getLocalPort() + "\\";
         try {
