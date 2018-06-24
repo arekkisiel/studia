@@ -11,9 +11,12 @@ public class Triangles implements GLEventListener {
     private static List<float[]> bottomRightCoords;
     private static List<float[]> colors;
 
+
     private static final float[] RED = {1.0f, 0.0f, 0.0f};
     private static final float[] GREEN = {0.0f,1.0f,0.0f};
     private static final float[] BLUE = { 0.0f,0.0f,1.0f };
+    private static final float[] ORANGE = {1.0f, 0.5f, 0};
+    private static final float LINE_DIFF = 0.002f;
 
     Triangles(){
         topCoords = new ArrayList<>();
@@ -38,15 +41,52 @@ public class Triangles implements GLEventListener {
     }
 
     private void defineCoords() {
-        topCoords.add(new float[]{0, 0.2f});
-        bottomLeftCoords.add(new float[]{0.2f, 0});
-        bottomRightCoords.add(new float[]{0,0});
-        colors.add(GREEN);
+        //inner circle
+        topCoords.add(new float[]{0+LINE_DIFF, 0.2f});
+        bottomLeftCoords.add(new float[]{0.2f+LINE_DIFF, 0+LINE_DIFF});
+        bottomRightCoords.add(new float[]{0+LINE_DIFF,0+LINE_DIFF});
+        colors.add(BLUE);
+
+        topCoords.add(new float[]{0+LINE_DIFF, -0.2f});
+        bottomLeftCoords.add(new float[]{0.2f+LINE_DIFF, 0});
+        bottomRightCoords.add(new float[]{0+LINE_DIFF,0});
+        colors.add(BLUE);
 
         topCoords.add(new float[]{0, -0.2f});
-        bottomLeftCoords.add(new float[]{0.2f, 0});
+        bottomLeftCoords.add(new float[]{-0.2f, 0});
         bottomRightCoords.add(new float[]{0,0});
-        colors.add(RED);
+        colors.add(BLUE);
+
+        topCoords.add(new float[]{0, 0.2f});
+        bottomLeftCoords.add(new float[]{-0.2f, 0+LINE_DIFF});
+        bottomRightCoords.add(new float[]{0,0+LINE_DIFF});
+        colors.add(BLUE);
+
+        // medium circle
+        topCoords.add(new float[]{0, 0.4f});
+        bottomLeftCoords.add(new float[]{0f, 0.2f});
+        bottomRightCoords.add(new float[]{0.2f,0.2f});
+        colors.add(GREEN);
+
+        topCoords.add(new float[]{0.2f, 0.2f});
+        bottomLeftCoords.add(new float[]{0.2f, 0f});
+        bottomRightCoords.add(new float[]{0.4f,0f});
+        colors.add(ORANGE);
+
+        topCoords.add(new float[]{0.2f, -0.2f});
+        bottomLeftCoords.add(new float[]{0.2f, 0f});
+        bottomRightCoords.add(new float[]{0.4f,0f});
+        colors.add(GREEN);
+
+        topCoords.add(new float[]{0f, -0.4f});
+        bottomLeftCoords.add(new float[]{0f, -0.2f});
+        bottomRightCoords.add(new float[]{0.2f,-0.2f});
+        colors.add(ORANGE);
+
+        topCoords.add(new float[]{0f, -0.4f});
+        bottomLeftCoords.add(new float[]{0f, -0.2f});
+        bottomRightCoords.add(new float[]{-0.2f,-0.2f});
+        colors.add(GREEN);
     }
 
     @Override
