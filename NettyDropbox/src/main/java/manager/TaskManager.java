@@ -1,8 +1,8 @@
 package manager;
 
-import commons.Task;
-import commons.TaskDecoder;
-import commons.TaskEncoder;
+import commons.task.Task;
+import commons.task.TaskDecoder;
+import commons.task.TaskEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -15,6 +15,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
 
 public class TaskManager {
     private static int port = 8080;
@@ -22,6 +23,7 @@ public class TaskManager {
 
     private static ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue = new ConcurrentHashMap<>();
     private static ConcurrentLinkedQueue<Integer> clientPriority = new ConcurrentLinkedQueue<>();
+    private static Semaphore semaphore = new Semaphore(5);
     private static ConcurrentLinkedQueue<Task> allowedTasks = new ConcurrentLinkedQueue<>();
 
 
@@ -31,28 +33,6 @@ public class TaskManager {
 
     public static void main(String[] args) throws Exception {
         establishServerChannel();
-        while (true){
-            updateAllowedTasks();
-            System.out.println("Allowed tasks: " + allowedTasks.size());
-
-            System.out.println("Queued clients: " + taskQueue.size());
-            Thread.sleep(2000);
-        }
-    }
-
-    private static void updateAllowedTasks() {
-        if(allowedTasks.size() < 10){
-            for(int clientId : clientPriority){
-                if(allowedTasks.size() < 10) {
-                    Task tmpTask = taskQueue.get(clientId).poll();
-                    if (Objects.nonNull(tmpTask)) {
-                        allowedTasks.add(tmpTask);
-                        int tmpClient = clientPriority.poll();
-                        clientPriority.add(tmpClient);
-                    }
-                }
-            }
-        }
     }
 
 
@@ -66,8 +46,7 @@ public class TaskManager {
                     @Override
                     public void initChannel(SocketChannel ch)
                             throws Exception {
-                        ch.pipeline().addLast(new TaskDecoder(), new TaskEncoder(), new TaskManagerHandler(taskQueue, clientPriority));
-                        ch.pipeline().addLast(new TaskDecoder(), new TaskEncoder(), new TaskManagerHandler(taskQueue, clientPriority));
+                        ch.pipeline().addLast(new TaskDecoder(), new TaskEncoder(), new TaskManagerHandler(taskQueue, clientPriority, allowedTasks));
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);

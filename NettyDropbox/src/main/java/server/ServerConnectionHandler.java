@@ -1,20 +1,29 @@
-import java.io.*;
-import java.net.ServerSocket;
+package server;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Server{
+public class ServerConnectionHandler implements Runnable {
     private static Socket connection;
 
+    public ServerConnectionHandler(Socket clientSocket) {
+        this.connection = clientSocket;
+    }
 
-    public static void main(String[] args) throws IOException {
-        String path = "G:\\repos\\studia\\NettyDropbox\\Server\\";
-        ServerSocket serverSocket = new ServerSocket(8000);
-        while(true){
-            connection = serverSocket.accept();
-            saveFile();
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                saveFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -24,7 +33,6 @@ public class Server{
         try {
             Files.createDirectory(Paths.get(pathPort));
         } catch (FileAlreadyExistsException e) {
-            Paths.get(pathPort);
             DataInputStream dis = new DataInputStream(connection.getInputStream());
             String filename = dis.readUTF();
 

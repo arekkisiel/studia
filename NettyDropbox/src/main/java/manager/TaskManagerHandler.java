@@ -1,21 +1,25 @@
 package manager;
 
-import commons.Task;
+import commons.task.Task;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
+    private static ConcurrentLinkedQueue<Task> allowedTasks;
     private ByteBuf tmp;
+
     private static ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue;
     private static ConcurrentLinkedQueue<Integer> clientPriority;
 
-    public TaskManagerHandler(ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue, ConcurrentLinkedQueue<Integer> clientPriority){
+    public TaskManagerHandler(ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue, ConcurrentLinkedQueue<Integer> clientPriority, ConcurrentLinkedQueue<Task> allowedTasks){
         this.taskQueue = taskQueue;
         this.clientPriority = clientPriority;
+        this.allowedTasks = allowedTasks;
     }
 
     @Override
@@ -44,6 +48,28 @@ public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
         }
         System.out.println("Added new task. Queue size for client " + requestData.getClientId() + " is: " + taskQueue.get(requestData.getClientId()).size());
         System.out.println(requestData.getClientId() + " " + requestData.getTaskId().toString() + " " + requestData.getFilename());
+
+        updateAllowedTasks();
+        propagateAllowedTasks(ctx);
     }
 
+    private static void propagateAllowedTasks(ChannelHandlerContext ctx) {
+        for(Task allowedTask : allowedTasks)
+            ctx.channel().writeAndFlush(allowedTask);
+    }
+
+    private static void updateAllowedTasks() {
+        if(allowedTasks.size() < 10){
+            for(int clientId : clientPriority){
+                if(allowedTasks.size() < 10) {
+                    Task tmpTask = taskQueue.get(clientId).poll();
+                    if (Objects.nonNull(tmpTask)) {
+                        allowedTasks.add(tmpTask);
+                        int tmpClient = clientPriority.poll();
+                        clientPriority.add(tmpClient);
+                    }
+                }
+            }
+        }
+    }
 }

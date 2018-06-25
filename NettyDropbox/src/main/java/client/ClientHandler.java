@@ -1,6 +1,6 @@
 package client;
 
-import commons.Task;
+import commons.task.Task;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 

@@ -1,9 +1,9 @@
 package client;
 
 import commons.Directory;
-import commons.Task;
-import commons.TaskDecoder;
-import commons.TaskEncoder;
+import commons.task.Task;
+import commons.task.TaskDecoder;
+import commons.task.TaskEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -29,10 +29,11 @@ public class Client {
     public static int clientId;
     public static ChannelFuture taskManagerChannel;
     private static ConcurrentLinkedQueue<Task> tasksToPerform = new ConcurrentLinkedQueue<>();
+    private static Socket serverConnection;
 
     public static void main(String[] args) throws Exception {
         String path = "G:\\repos\\studia\\NettyDropbox\\Clients\\";
-        Socket serverConnection = new Socket("127.0.0.1", 8000);
+        serverConnection = new Socket("127.0.0.1", 8000);
         String pathPort = path + serverConnection.getLocalPort() + "\\";
         clientId = serverConnection.getLocalPort();
         establishTaskManagerConnection();
@@ -44,8 +45,28 @@ public class Client {
             Paths.get(pathPort);
         }
 
-        Directory watcher = new Directory(pathPort);
+        Runnable runnable = () -> {
+            while(true) {
+                System.out.println("Tasks to perform: " + tasksToPerform.size());
+                try {
+                    if (tasksToPerform.size() > 0) {
+                        Task tmpTask = tasksToPerform.poll();
+                        sendFileToServer(Paths.get(pathPort), tmpTask.getFilename(), serverConnection);
+                    }
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
 
+        Thread thread = new Thread(runnable);
+        thread.start();
+
+
+        Directory watcher = new Directory(pathPort);
         while(true){
             String watcherResponse = watcher.checkDirectory();
             System.out.println("Detected new item.");
@@ -53,13 +74,6 @@ public class Client {
                 Thread.sleep(100);
                 System.out.println("Sending new task to manager.");
                 sendTaskToManager(watcherResponse);
-
-                Task newTask = new Task(clientId, UUID.randomUUID(), watcherResponse);
-                tasksToPerform.add(newTask);
-            }
-            if(tasksToPerform.size() > 0){
-                Task tmpTask = tasksToPerform.poll();
-                sendFileToServer(Paths.get(pathPort), tmpTask.getFilename(), serverConnection);
             }
         }
 
