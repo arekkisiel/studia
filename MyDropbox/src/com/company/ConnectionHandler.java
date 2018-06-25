@@ -14,11 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 public class ConnectionHandler implements Runnable {
     private static Socket connection;
-    private static Semaphore semaphore;
+    private static Socket taskManager;
 
-    public ConnectionHandler(Socket clientSocket, Semaphore semaphore) {
+    public ConnectionHandler(Socket clientSocket) {
         this.connection = clientSocket;
-        this.semaphore = semaphore;
     }
 
 //    26.06 godz 10 w pokoju
