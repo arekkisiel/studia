@@ -6,10 +6,11 @@ import java.net.Socket;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 public class Server{
     private static int clientId = 0;
-    private static int port = 8000;
+    private static int port = new Random().nextInt(3000) + 4000;
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(port);
@@ -53,6 +54,7 @@ public class Server{
     }
 
     private static void saveFile(Socket connection) throws IOException {
+        System.out.println("Saving data.");
         String path = "C:\\repos\\studia\\NettyDropbox\\Server\\" + clientId + "\\";
         DataInputStream dis = new DataInputStream(connection.getInputStream());
         String filename = "";
