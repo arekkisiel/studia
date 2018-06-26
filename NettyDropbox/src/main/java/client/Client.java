@@ -131,7 +131,7 @@ public class Client {
     }
 
     private static void sendTaskToManager(String filename) throws InterruptedException {
-        Task newTask = new Task(clientId, UUID.randomUUID(), filename);
+        Task newTask = new Task(clientId, UUID.randomUUID(), filename, true);
         taskManagerChannel.channel().writeAndFlush(newTask);
     }
 

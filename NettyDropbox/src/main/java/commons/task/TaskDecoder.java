@@ -19,8 +19,8 @@ public class TaskDecoder  extends ReplayingDecoder<Task> {
         newTask.setClientId(in.readInt());
         newTask.setTaskId(UUID.fromString(in.readCharSequence(36, charset).toString()));
         int strLen = in.readInt();
-        newTask.setFilename(
-                in.readCharSequence(strLen, charset).toString());
+        newTask.setFilename(in.readCharSequence(strLen, charset).toString());
+        newTask.setUpload(in.readBoolean());
         try{
             newTask.setServerPort(in.readInt());
         } catch (Exception e){

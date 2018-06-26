@@ -8,18 +8,21 @@ public class Task {
     private UUID taskId;
     private String filename;
     private int serverPort;
+    private boolean isUpload;
 
-    public Task(int clientId, UUID taskId, String filename) {
+    public Task(int clientId, UUID taskId, String filename, boolean type) {
         this.clientId = clientId;
         this.taskId = taskId;
         this.filename = filename;
+        this.isUpload = type;
     }
 
-    public Task(int clientId, UUID taskId, String filename, int serverPort) {
+    public Task(int clientId, UUID taskId, String filename, int serverPort, boolean type) {
         this.clientId = clientId;
         this.taskId = taskId;
         this.filename = filename;
         this.serverPort = serverPort;
+        this.isUpload = type;
     }
 
     public Task() {
@@ -59,5 +62,13 @@ public class Task {
 
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
+    }
+
+    public boolean isUpload() {
+        return isUpload;
+    }
+
+    public void setUpload(boolean upload) {
+        isUpload = upload;
     }
 }
