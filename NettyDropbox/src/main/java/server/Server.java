@@ -8,16 +8,38 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Server{
-    private static Socket connection;
-
 
     public static void main(String[] args) throws IOException {
-//        String path = "G:\\repos\\studia\\NettyDropbox\\Server\\";
         ServerSocket serverSocket = new ServerSocket(8000);
         while(true){
-            connection = serverSocket.accept();
-            Runnable connectionHandler = new ServerConnectionHandler(connection);
-            new Thread(connectionHandler).start();
+            Socket connection = serverSocket.accept();
+            Runnable runnable = () -> {
+                try {
+                    saveFile(connection);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
+            new Thread(runnable).start();
+
+        }
+    }
+
+    private static void saveFile(Socket connection) throws IOException {
+        String path = "G:\\repos\\studia\\NettyDropbox\\Server\\";
+        String pathPort = path + 1000 + "\\";
+        try {
+            Files.createDirectory(Paths.get(pathPort));
+        } catch (FileAlreadyExistsException e) {
+            DataInputStream dis = new DataInputStream(connection.getInputStream());
+            String filename = dis.readUTF();
+
+            FileOutputStream outputStream = new FileOutputStream(new File(pathPort + filename));
+
+            int count;
+            byte[] buffer = new byte[8192];
+            while ((count = dis.read(buffer)) > 0)
+                outputStream.write(buffer, 0, count);
         }
     }
 }

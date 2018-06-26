@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -33,16 +34,19 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         String path = "G:\\repos\\studia\\NettyDropbox\\Clients\\";
+
         serverConnection = new Socket("127.0.0.1", 8000);
-        String pathPort = path + serverConnection.getLocalPort() + "\\";
-        clientId = serverConnection.getLocalPort();
+        clientId = 1000;
+        String clientPath = path + clientId + "\\";
+        String serverPath = "G:\\repos\\studia\\NettyDropbox\\Server\\" + clientId;
         establishTaskManagerConnection();
 
         try {
-            Files.createDirectory(Paths.get(pathPort));
+            Files.createDirectory(Paths.get(clientPath));
+            Files.createDirectory(Paths.get(serverPath));
         }
         catch(FileAlreadyExistsException e) {
-            Paths.get(pathPort);
+            Paths.get(clientPath);
         }
 
         Runnable runnable = () -> {
@@ -51,7 +55,9 @@ public class Client {
                 try {
                     if (tasksToPerform.size() > 0) {
                         Task tmpTask = tasksToPerform.poll();
-                        sendFileToServer(Paths.get(pathPort), tmpTask.getFilename(), serverConnection);
+                        serverConnection = new Socket("127.0.0.1", 8000);
+                        sendFileToServer(Paths.get(clientPath), tmpTask.getFilename(), serverConnection);
+                        serverConnection.close();
                     }
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -66,7 +72,7 @@ public class Client {
         thread.start();
 
 
-        Directory watcher = new Directory(pathPort);
+        Directory watcher = new Directory(clientPath);
         while(true){
             String watcherResponse = watcher.checkDirectory();
             System.out.println("Detected new item.");
@@ -110,7 +116,7 @@ public class Client {
         FileInputStream fis = new FileInputStream(filepath.toString() + "\\" + filename);
 
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-        dos.writeUTF(String.valueOf(filename));
+        dos.writeUTF(filename);
 
         int count;
         byte[] buffer = new byte[8192];

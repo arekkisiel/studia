@@ -23,7 +23,6 @@ public class TaskManager {
 
     private static ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue = new ConcurrentHashMap<>();
     private static ConcurrentLinkedQueue<Integer> clientPriority = new ConcurrentLinkedQueue<>();
-    private static Semaphore semaphore = new Semaphore(5);
     private static ConcurrentLinkedQueue<Task> allowedTasks = new ConcurrentLinkedQueue<>();
 
 

@@ -50,12 +50,16 @@ public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
         System.out.println(requestData.getClientId() + " " + requestData.getTaskId().toString() + " " + requestData.getFilename());
 
         updateAllowedTasks();
-        propagateAllowedTasks(ctx);
+        propagateAllowedTasks(ctx, clientId);
     }
 
-    private static void propagateAllowedTasks(ChannelHandlerContext ctx) {
-        for(Task allowedTask : allowedTasks)
-            ctx.channel().writeAndFlush(allowedTask);
+    private static void propagateAllowedTasks(ChannelHandlerContext ctx, int clientId) {
+        for(Task allowedTask : allowedTasks) {
+            if(allowedTask.getClientId() == clientId) {
+                ctx.channel().writeAndFlush(allowedTask);
+                allowedTasks.remove(allowedTask);
+            }
+        }
     }
 
     private static void updateAllowedTasks() {
