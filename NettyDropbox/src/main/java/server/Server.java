@@ -31,7 +31,9 @@ public class Server{
 
     private static void registerToTaskManager() {
         try {
-            new Socket("localhost", 8081);
+            Socket s = new Socket("localhost", 8081);
+            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+            dos.writeInt(port);
         } catch (IOException e) {
             e.printStackTrace();
         }

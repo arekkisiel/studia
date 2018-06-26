@@ -15,11 +15,15 @@ public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
 
     private static ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue;
     private static ConcurrentLinkedQueue<Integer> clientPriority;
+    private static ConcurrentLinkedQueue<Integer> serverList;
 
-    public TaskManagerHandler(ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue, ConcurrentLinkedQueue<Integer> clientPriority, ConcurrentLinkedQueue<Task> allowedTasks){
+    public TaskManagerHandler(ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue,
+                              ConcurrentLinkedQueue<Integer> clientPriority, ConcurrentLinkedQueue<Task> allowedTasks,
+                              ConcurrentLinkedQueue<Integer> serverList){
         this.taskQueue = taskQueue;
         this.clientPriority = clientPriority;
         this.allowedTasks = allowedTasks;
+        this.serverList = serverList;
     }
 
     @Override
@@ -56,6 +60,9 @@ public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
     private static void propagateAllowedTasks(ChannelHandlerContext ctx, int clientId) {
         for(Task allowedTask : allowedTasks) {
             if(allowedTask.getClientId() == clientId) {
+                int server = serverList.poll();
+                allowedTask.setServerPort(server);
+                serverList.add(server);
                 ctx.channel().writeAndFlush(allowedTask);
                 allowedTasks.remove(allowedTask);
             }

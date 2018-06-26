@@ -30,15 +30,15 @@ public class Client {
     public static int clientId;
     public static ChannelFuture taskManagerChannel;
     private static ConcurrentLinkedQueue<Task> tasksToPerform = new ConcurrentLinkedQueue<>();
-    private static Socket serverConnection;
+//    private static Socket serverConnection;
 
     public static void main(String[] args) throws Exception {
         String path = "C:\\repos\\studia\\NettyDropbox\\Clients\\";
 
-        serverConnection = new Socket("127.0.0.1", 8000);
+//        serverConnection = new Socket("127.0.0.1", 8000);
         clientId = new Random().nextInt(3000) + 4000;
         String clientPath = path + clientId + "\\";
-        initializeWorkspace();
+//        initializeWorkspace(serverConnection);
         establishTaskManagerConnection();
 
         try {
@@ -54,8 +54,8 @@ public class Client {
                 try {
                     if (tasksToPerform.size() > 0) {
                         Task tmpTask = tasksToPerform.poll();
-                        serverConnection = new Socket("127.0.0.1", 8000);
-                        initializeWorkspace();
+                        Socket serverConnection = new Socket("127.0.0.1", tmpTask.getServerPort());
+                        initializeWorkspace(serverConnection);
                         sendFileToServer(Paths.get(clientPath), tmpTask.getFilename(), serverConnection);
                         serverConnection.close();
                     }
@@ -85,7 +85,7 @@ public class Client {
 
     }
 
-    private static void initializeWorkspace() throws IOException {
+    private static void initializeWorkspace(Socket serverConnection) throws IOException {
         DataOutputStream dos = new DataOutputStream(serverConnection.getOutputStream());
         dos.writeInt(clientId);
     }

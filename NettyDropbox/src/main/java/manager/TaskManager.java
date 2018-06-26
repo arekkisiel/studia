@@ -12,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Objects;
@@ -48,7 +49,8 @@ public class TaskManager {
         Runnable acceptServers = () -> {
             while (true){
                 try {
-                    serverList.add(taskManagerServer.accept().getLocalPort());
+                    DataInputStream dis = new DataInputStream(taskManagerServer.accept().getInputStream());
+                    serverList.add(dis.readInt());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -69,7 +71,7 @@ public class TaskManager {
                     @Override
                     public void initChannel(SocketChannel ch)
                             throws Exception {
-                        ch.pipeline().addLast(new TaskDecoder(), new TaskEncoder(), new TaskManagerHandler(taskQueue, clientPriority, allowedTasks));
+                        ch.pipeline().addLast(new TaskDecoder(), new TaskEncoder(), new TaskManagerHandler(taskQueue, clientPriority, allowedTasks, serverList));
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
