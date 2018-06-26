@@ -48,7 +48,7 @@ public class Client {
             Paths.get(clientPath);
         }
 
-        Runnable runnable = () -> {
+        Runnable performTasks = () -> {
             while(true) {
                 System.out.println("Tasks to perform: " + tasksToPerform.size());
                 try {
@@ -68,8 +68,22 @@ public class Client {
             }
         };
 
-        Thread thread = new Thread(runnable);
+        Thread thread = new Thread(performTasks);
         thread.start();
+
+        Runnable getTasks = () -> {
+            while(true) {
+                try {
+                    pollManagerForTasks();
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread thread2 = new Thread(getTasks);
+        thread2.start();
 
 
         Directory watcher = new Directory(clientPath);
@@ -111,6 +125,10 @@ public class Client {
         taskManagerChannel = b.connect(host, port).sync();
     }
 
+    private static void pollManagerForTasks() {
+        Task newTask = new Task(clientId);
+        taskManagerChannel.channel().writeAndFlush(newTask);
+    }
 
     private static void sendTaskToManager(String filename) throws InterruptedException {
         Task newTask = new Task(clientId, UUID.randomUUID(), filename);

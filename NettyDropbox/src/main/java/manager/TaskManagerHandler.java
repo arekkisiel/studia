@@ -43,16 +43,17 @@ public class TaskManagerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         Task requestData = (Task) msg;
         int clientId = requestData.getClientId();
-        try {
-            taskQueue.get(clientId).add(requestData);
-        } catch(NullPointerException e){
-            clientPriority.add(clientId);
-            taskQueue.put(clientId, new ConcurrentLinkedQueue());
-            taskQueue.get(clientId).add(requestData);
+        if(Objects.nonNull(requestData.getTaskId())){
+            try {
+                taskQueue.get(clientId).add(requestData);
+            } catch(NullPointerException e){
+                clientPriority.add(clientId);
+                taskQueue.put(clientId, new ConcurrentLinkedQueue());
+                taskQueue.get(clientId).add(requestData);
+            }
+            System.out.println("Added new task. Queue size for client " + requestData.getClientId() + " is: " + taskQueue.get(requestData.getClientId()).size());
+            System.out.println(requestData.getClientId() + " " + requestData.getTaskId().toString() + " " + requestData.getFilename());
         }
-        System.out.println("Added new task. Queue size for client " + requestData.getClientId() + " is: " + taskQueue.get(requestData.getClientId()).size());
-        System.out.println(requestData.getClientId() + " " + requestData.getTaskId().toString() + " " + requestData.getFilename());
-
         updateAllowedTasks();
         propagateAllowedTasks(ctx, clientId);
     }
