@@ -36,14 +36,13 @@ public class Client {
         String path = "G:\\repos\\studia\\NettyDropbox\\Clients\\";
 
         serverConnection = new Socket("127.0.0.1", 8000);
-        clientId = 1000;
+        clientId = new Random().nextInt(3000) + 4000;
         String clientPath = path + clientId + "\\";
-        String serverPath = "G:\\repos\\studia\\NettyDropbox\\Server\\" + clientId;
+        initializeWorkspace();
         establishTaskManagerConnection();
 
         try {
             Files.createDirectory(Paths.get(clientPath));
-            Files.createDirectory(Paths.get(serverPath));
         }
         catch(FileAlreadyExistsException e) {
             Paths.get(clientPath);
@@ -56,6 +55,7 @@ public class Client {
                     if (tasksToPerform.size() > 0) {
                         Task tmpTask = tasksToPerform.poll();
                         serverConnection = new Socket("127.0.0.1", 8000);
+                        initializeWorkspace();
                         sendFileToServer(Paths.get(clientPath), tmpTask.getFilename(), serverConnection);
                         serverConnection.close();
                     }
@@ -83,6 +83,11 @@ public class Client {
             }
         }
 
+    }
+
+    private static void initializeWorkspace() throws IOException {
+        DataOutputStream dos = new DataOutputStream(serverConnection.getOutputStream());
+        dos.writeInt(clientId);
     }
 
     private static void establishTaskManagerConnection() throws InterruptedException {
@@ -114,8 +119,8 @@ public class Client {
 
     private static void sendFileToServer(Path filepath, String filename, Socket s) throws IOException {
         FileInputStream fis = new FileInputStream(filepath.toString() + "\\" + filename);
-
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+
         dos.writeUTF(filename);
 
         int count;
