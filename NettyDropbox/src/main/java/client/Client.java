@@ -33,7 +33,7 @@ public class Client {
     private static Socket serverConnection;
 
     public static void main(String[] args) throws Exception {
-        String path = "G:\\repos\\studia\\NettyDropbox\\Clients\\";
+        String path = "C:\\repos\\studia\\NettyDropbox\\Clients\\";
 
         serverConnection = new Socket("127.0.0.1", 8000);
         clientId = new Random().nextInt(3000) + 4000;

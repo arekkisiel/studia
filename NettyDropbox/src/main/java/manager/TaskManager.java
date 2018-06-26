@@ -12,6 +12,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,6 +26,16 @@ public class TaskManager {
     private static ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Task>> taskQueue = new ConcurrentHashMap<>();
     private static ConcurrentLinkedQueue<Integer> clientPriority = new ConcurrentLinkedQueue<>();
     private static ConcurrentLinkedQueue<Task> allowedTasks = new ConcurrentLinkedQueue<>();
+    private static ServerSocket taskManagerServer;
+    private static ConcurrentLinkedQueue<Integer> serverList = new ConcurrentLinkedQueue<>();
+
+    static {
+        try {
+            taskManagerServer = new ServerSocket(8081);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public TaskManager(int port) {
@@ -32,6 +44,18 @@ public class TaskManager {
 
     public static void main(String[] args) throws Exception {
         establishServerChannel();
+
+        Runnable acceptServers = () -> {
+            while (true){
+                try {
+                    serverList.add(taskManagerServer.accept().getLocalPort());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(acceptServers).run();
     }
 
 

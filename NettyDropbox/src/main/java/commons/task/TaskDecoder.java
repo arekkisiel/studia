@@ -5,6 +5,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 
+import java.io.EOFException;
+import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +21,11 @@ public class TaskDecoder  extends ReplayingDecoder<Task> {
         int strLen = in.readInt();
         newTask.setFilename(
                 in.readCharSequence(strLen, charset).toString());
+        try{
+            newTask.setServerPort(in.readInt());
+        } catch (Exception e){
+            // do nothing
+        }
         out.add(newTask);
     }
 }

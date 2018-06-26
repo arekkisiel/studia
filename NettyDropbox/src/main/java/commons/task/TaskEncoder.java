@@ -15,5 +15,6 @@ public class TaskEncoder extends MessageToByteEncoder<Task>{
         byteBuf.writeCharSequence(task.getTaskId().toString(),charset);
         byteBuf.writeInt(task.getFilename().length());
         byteBuf.writeCharSequence(task.getFilename(), charset);
+        byteBuf.writeInt(task.getServerPort());
     }
 }

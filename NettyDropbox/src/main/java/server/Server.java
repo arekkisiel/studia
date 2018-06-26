@@ -9,9 +9,11 @@ import java.nio.file.Paths;
 
 public class Server{
     private static int clientId = 0;
+    private static int port = 8000;
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8000);
+        ServerSocket serverSocket = new ServerSocket(port);
+        registerToTaskManager();
         while(true){
             Socket connection = serverSocket.accept();
             initializeWorkspace(connection);
@@ -27,11 +29,19 @@ public class Server{
         }
     }
 
+    private static void registerToTaskManager() {
+        try {
+            new Socket("localhost", 8081);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void initializeWorkspace(Socket connection) throws IOException {
         DataInputStream dis = new DataInputStream(connection.getInputStream());
         try {
             clientId = dis.readInt();
-            String path = "G:\\repos\\studia\\NettyDropbox\\Server\\" + clientId;
+            String path = "C:\\repos\\studia\\NettyDropbox\\Server\\" + clientId;
             Files.createDirectory(Paths.get(path));
         } catch (FileAlreadyExistsException e){
           //do nothing
@@ -41,7 +51,7 @@ public class Server{
     }
 
     private static void saveFile(Socket connection) throws IOException {
-        String path = "G:\\repos\\studia\\NettyDropbox\\Server\\" + clientId + "\\";
+        String path = "C:\\repos\\studia\\NettyDropbox\\Server\\" + clientId + "\\";
         DataInputStream dis = new DataInputStream(connection.getInputStream());
         String filename = "";
         try {
